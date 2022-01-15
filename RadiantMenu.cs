@@ -37,26 +37,24 @@ namespace RadiantMenu
             LangStrings = new LanguageStrings();
             SpriteDict = new TextureStrings();
 
-            MenuStyleHelper.Initialize();
             MenuStyleHelper.AddMenuStyleHook += AddRadiantMenuStyle;
 
-            TitleLogoHelper.Initialize();
             _hkLogoBlackId = TitleLogoHelper.AddLogo(SpriteDict.Get(TextureStrings.HkLogoBlackKey));
         }
 
         public override void Initialize()
         {
-            ModHooks.Instance.LanguageGetHook += OnLanguageGetHook;
+            ModHooks.LanguageGetHook += OnLanguageGetHook;
         }
         
-        private string OnLanguageGetHook(string key, string sheet)
+        private string OnLanguageGetHook(string key, string sheet, string orig)
         {
             //Log($"Sheet: {sheet}; Key: {key}");
             if (LangStrings.ContainsKey(key, sheet))
             {
                 return LangStrings.Get(key, sheet);
             }
-            return Language.Language.GetInternal(key, sheet);
+            return orig;
         }
 
         private (string languageString, GameObject styleGo, int titleIndex, string unlockKey, string[] achievementKeys, MenuStyles.MenuStyle.CameraCurves cameraCurves, AudioMixerSnapshot musicSnapshot) AddRadiantMenuStyle(MenuStyles self)
