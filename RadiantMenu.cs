@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 using Modding;
 using RadiantMenu.Consts;
 using SFCore;
 using SFCore.Utils;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 using LanguageStrings = RadiantMenu.Consts.LanguageStrings;
 using Object = UnityEngine.Object;
 
@@ -30,7 +29,7 @@ namespace RadiantMenu
         public LanguageStrings LangStrings { get; private set; }
         public TextureStrings SpriteDict { get; private set; }
 
-        private int _hkLogoBlackId = -1;
+        private readonly int _hkLogoBlackId;
 
         public RadiantMenu() : base("Radiant Menu Theme")
         {
@@ -40,11 +39,42 @@ namespace RadiantMenu
             MenuStyleHelper.AddMenuStyleHook += AddRadiantMenuStyle;
 
             _hkLogoBlackId = TitleLogoHelper.AddLogo(SpriteDict.Get(TextureStrings.HkLogoBlackKey));
+            
+            On.UIManager.Start += AddRadiantIcon;
+            On.SetVersionNumber.Start += (orig, self) =>
+            {
+                orig(self);
+
+                string origText = self.GetComponent<Text>().text;
+                var splitText = origText.Split(new string[] {"."}, StringSplitOptions.RemoveEmptyEntries);
+                int part1 = int.Parse(splitText[0]);
+                int part2 = int.Parse(splitText[1]);
+                int part3 = int.Parse(splitText[2]) + 6;
+                int part4 = int.Parse(splitText[3]) + 5555;
+                self.GetComponent<Text>().text = $"{part1}.{part2}.{part3}.{part4}";
+            };
         }
 
         public override void Initialize()
         {
             ModHooks.LanguageGetHook += OnLanguageGetHook;
+        }
+
+        private void AddRadiantIcon(On.UIManager.orig_Start orig, UIManager self)
+        {
+            orig(self);
+
+            var dlc = self.transform.Find("UICanvas/MainMenuScreen/TeamCherryLogo/Hidden_Dreams_Logo").gameObject;
+
+            var clone = Object.Instantiate(dlc, dlc.transform.parent);
+            clone.SetActive(true);
+
+            var pos = clone.transform.position;
+
+            clone.transform.position = pos + new Vector3(3.1f, -0.15f, 0);
+
+            var sr = clone.GetComponent<SpriteRenderer>();
+            sr.sprite = SpriteDict.Get(TextureStrings.RadDlcLogoKey);
         }
         
         private string OnLanguageGetHook(string key, string sheet, string orig)
@@ -59,14 +89,15 @@ namespace RadiantMenu
 
         private (string languageString, GameObject styleGo, int titleIndex, string unlockKey, string[] achievementKeys, MenuStyles.MenuStyle.CameraCurves cameraCurves, AudioMixerSnapshot musicSnapshot) AddRadiantMenuStyle(MenuStyles self)
         {
+            const float rgbMultiplier = 0.875f; // 0 means black, 1 means original colour
             GameObject menuStylesGo = self.gameObject;
             var radiantStyleGo = menuStylesGo.transform.GetChild(4).gameObject;
             foreach (var sr in radiantStyleGo.GetComponentsInChildren<SpriteRenderer>())
             {
                 var tmpColor = sr.color;
-                tmpColor.r *= 0.75f;
-                tmpColor.g *= 0.75f;
-                tmpColor.b *= 0.75f;
+                tmpColor.r *= rgbMultiplier;
+                tmpColor.g *= rgbMultiplier;
+                tmpColor.b *= rgbMultiplier;
                 sr.color = tmpColor;
             }
             foreach (var ps in radiantStyleGo.GetComponentsInChildren<ParticleSystem>())
@@ -74,14 +105,14 @@ namespace RadiantMenu
                 var main = ps.main;
                 var tmpGrad = main.startColor;
                 var tmpColor = tmpGrad.colorMin;
-                tmpColor.r *= 0.75f;
-                tmpColor.g *= 0.75f;
-                tmpColor.b *= 0.75f;
+                tmpColor.r *= rgbMultiplier;
+                tmpColor.g *= rgbMultiplier;
+                tmpColor.b *= rgbMultiplier;
                 tmpGrad.colorMin = tmpColor;
                 tmpColor = tmpGrad.colorMax;
-                tmpColor.r *= 0.75f;
-                tmpColor.g *= 0.75f;
-                tmpColor.b *= 0.75f;
+                tmpColor.r *= rgbMultiplier;
+                tmpColor.g *= rgbMultiplier;
+                tmpColor.b *= rgbMultiplier;
                 tmpGrad.colorMax = tmpColor;
                 main.startColor = tmpGrad;
             }

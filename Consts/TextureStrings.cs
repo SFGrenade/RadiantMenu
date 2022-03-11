@@ -10,6 +10,8 @@ namespace RadiantMenu.Consts
         #region Misc
         public const string HkLogoBlackKey = "HKLogoBlack";
         private const string HkLogoBlackFile = "RadiantMenu.Resources.HKLogoBlack.png";
+        public const string RadDlcLogoKey = "RadiantMenuLogoThing";
+        private const string RadDlcLogoFile = "RadiantMenu.Resources.RadiantMenuLogoThing.png";
         #endregion Misc
 
         private readonly Dictionary<string, Sprite> _dict;
@@ -19,10 +21,12 @@ namespace RadiantMenu.Consts
             Assembly asm = Assembly.GetExecutingAssembly();
             _dict = new Dictionary<string, Sprite>();
             string[] tmpTextureFiles = {
-                HkLogoBlackFile
+                HkLogoBlackFile,
+                RadDlcLogoFile
             };
             string[] tmpTextureKeys = {
-                HkLogoBlackKey
+                HkLogoBlackKey,
+                RadDlcLogoKey
             };
             for (int i = 0; i < tmpTextureFiles.Length; i++)
             {
