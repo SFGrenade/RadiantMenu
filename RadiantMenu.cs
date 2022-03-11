@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Modding;
@@ -30,6 +30,8 @@ namespace RadiantMenu
         public TextureStrings SpriteDict { get; private set; }
 
         private readonly int _hkLogoBlackId;
+        private Text VersionNumber = null;
+        private string newVersionNumberText;
 
         public RadiantMenu() : base("Radiant Menu Theme")
         {
@@ -45,13 +47,26 @@ namespace RadiantMenu
             {
                 orig(self);
 
-                string origText = self.GetComponent<Text>().text;
-                var splitText = origText.Split(new string[] {"."}, StringSplitOptions.RemoveEmptyEntries);
+                VersionNumber = self.GetComponent<Text>();
+                var splitText = VersionNumber.text.Split(new string[] {"."}, StringSplitOptions.RemoveEmptyEntries);
                 int part1 = int.Parse(splitText[0]);
                 int part2 = int.Parse(splitText[1]);
                 int part3 = int.Parse(splitText[2]) + 6;
                 int part4 = int.Parse(splitText[3]) + 5555;
-                self.GetComponent<Text>().text = $"{part1}.{part2}.{part3}.{part4}";
+                newVersionNumberText = $"{part1}.{part2}.{part3}.{part4}";
+            };
+
+            On.MenuStyles.SetStyle += (orig, self, index, fade, save) =>
+            {
+                if (self.styles[index].displayName == "UI_MENU_STYLE_RADIANT")
+                {
+                    VersionNumber.text = newVersionNumberText;
+                }
+                else
+                {
+                    VersionNumber.text = Constants.GAME_VERSION;
+                }
+                orig(self, index, fade, save);
             };
         }
 
