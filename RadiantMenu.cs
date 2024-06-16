@@ -41,14 +41,14 @@ namespace RadiantMenu
             MenuStyleHelper.AddMenuStyleHook += AddRadiantMenuStyle;
 
             _hkLogoBlackId = TitleLogoHelper.AddLogo(SpriteDict.Get(TextureStrings.HkLogoBlackKey));
-            
+
             var splitText = Constants.GAME_VERSION.Split(new string[] {"."}, StringSplitOptions.RemoveEmptyEntries);
             int part1 = int.Parse(splitText[0]);
             int part2 = int.Parse(splitText[1]);
             int part3 = int.Parse(splitText[2]) + 6;
             int part4 = int.Parse(splitText[3]) + 5555;
             newVersionNumberText = $"{part1}.{part2}.{part3}.{part4}";
-            
+
             On.UIManager.Start += AddRadiantIcon;
             On.SetVersionNumber.Start += (orig, self) =>
             {
@@ -94,7 +94,7 @@ namespace RadiantMenu
             var sr = clone.GetComponent<SpriteRenderer>();
             sr.sprite = SpriteDict.Get(TextureStrings.RadDlcLogoKey);
         }
-        
+
         private string OnLanguageGetHook(string key, string sheet, string orig)
         {
             //Log($"Sheet: {sheet}; Key: {key}");
