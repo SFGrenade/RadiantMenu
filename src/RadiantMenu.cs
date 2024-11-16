@@ -8,7 +8,6 @@ using SFCore.Utils;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
-using LanguageStrings = RadiantMenu.Consts.LanguageStrings;
 using Object = UnityEngine.Object;
 
 namespace RadiantMenu;
@@ -26,7 +25,7 @@ public class RadiantMenu : Mod
         };
     }
 
-    public LanguageStrings LangStrings { get; private set; }
+    public SFCore.Utils.LanguageStrings LangStrings { get; private set; }
     public TextureStrings SpriteDict { get; private set; }
 
     private readonly int _hkLogoBlackId;
@@ -35,12 +34,13 @@ public class RadiantMenu : Mod
 
     public RadiantMenu() : base("Radiant Menu Theme")
     {
-        LangStrings = new LanguageStrings();
+        LangStrings = new LanguageStrings(Assembly.GetExecutingAssembly(), "RadiantMenu.Resources.Language.json");
         SpriteDict = new TextureStrings();
 
         MenuStyleHelper.AddMenuStyleHook += AddRadiantMenuStyle;
 
         _hkLogoBlackId = TitleLogoHelper.AddLogo(SpriteDict.Get(TextureStrings.HkLogoBlackKey));
+        DlcIconHelper.AddDlcIcon(SpriteDict.Get(TextureStrings.RadDlcLogoKey));
 
         var splitText = Constants.GAME_VERSION.Split(new string[] {"."}, StringSplitOptions.RemoveEmptyEntries);
         int part1 = int.Parse(splitText[0]);
@@ -49,7 +49,6 @@ public class RadiantMenu : Mod
         int part4 = int.Parse(splitText[3]) + 5555;
         newVersionNumberText = $"{part1}.{part2}.{part3}.{part4}";
 
-        On.UIManager.Start += AddRadiantIcon;
         On.SetVersionNumber.Start += (orig, self) =>
         {
             orig(self);
@@ -76,23 +75,6 @@ public class RadiantMenu : Mod
     public override void Initialize()
     {
         ModHooks.LanguageGetHook += OnLanguageGetHook;
-    }
-
-    private void AddRadiantIcon(On.UIManager.orig_Start orig, UIManager self)
-    {
-        orig(self);
-
-        var dlc = self.transform.Find("UICanvas/MainMenuScreen/TeamCherryLogo/Hidden_Dreams_Logo").gameObject;
-
-        var clone = Object.Instantiate(dlc, dlc.transform.parent);
-        clone.SetActive(true);
-
-        var pos = clone.transform.position;
-
-        clone.transform.position = pos + new Vector3(3.1f, -0.15f, 0);
-
-        var sr = clone.GetComponent<SpriteRenderer>();
-        sr.sprite = SpriteDict.Get(TextureStrings.RadDlcLogoKey);
     }
 
     private string OnLanguageGetHook(string key, string sheet, string orig)
